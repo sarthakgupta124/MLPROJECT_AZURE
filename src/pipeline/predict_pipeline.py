@@ -3,6 +3,7 @@ from src.logger import logging
 from src.exception import CustomException
 import sys
 import pandas as pd
+import os
 
 
 class CustomData:
@@ -46,12 +47,18 @@ class PredictPipeline:
         pass
     def predict(self,features):
         try:
-            model=load_obj("artifacts\model.pickle")
-            preprocessor=load_obj("artifacts\proprocessor.pkl")
+            # Construct paths using os.path.join for Linux/Azure compatibility
+            model_path = os.path.join("artifacts", "model.pickle")
+            preprocessor_path = os.path.join("artifacts", "proprocessor.pkl")
 
-            scaled_fea=preprocessor.transform(features)
+            # Load objects
+            model = load_obj(model_path)
+            preprocessor = load_obj(preprocessor_path)
 
-            pred_data=model.predict(scaled_fea)
+            # Transform and predict
+            scaled_fea = preprocessor.transform(features)
+            pred_data = model.predict(scaled_fea)
+            
             return pred_data
         except Exception as e:
             raise CustomException(e,sys)
